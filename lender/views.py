@@ -30,6 +30,22 @@ def become_lender(request):
 def lender_admin(request):
     lender = request.user.lender
     products = lender.products.all()
+    orders = lender.orders.all() 
+     
+        
+    for order in orders:
+        order.lender_amount = 0
+        order.lender_paid_amount = 0
+        order.fully_paid = True
+
+        for item in order.items.all():
+            if item.lender == request.user.lender:
+                if item.lender_paid:
+                    order.lender_paid_amount += item.get_total_price()
+                else:
+                    order.lender_amount += item.get_total_price()
+                    order.fully_paid = False
+
     return render(request, 'lender/lender_admin.html', {'lender': lender, 'products': products})
 
 

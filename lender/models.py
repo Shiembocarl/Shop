@@ -11,3 +11,11 @@ class Lender(models.Model):
     
     def __str__(self):
         return self.name
+        
+    def get_balance(self):
+        items = self.items.filter(lender_paid=False, order__lenders__in=[self.id])
+        return sum((item.product.price * item.quantity) for item in items)
+    
+    def get_paid_amount(self):
+        items = self.items.filter(lender_paid=True, order__lenders__in=[self.id])
+        return sum((item.product.price * item.quantity) for item in items)
